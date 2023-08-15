@@ -3,6 +3,7 @@ const data = require("../db/data/test-data/index");
 const db = require("../db/connection");
 const request = require("supertest");
 const app = require("../app");
+const { string } = require("pg-format");
 
 beforeEach(() => {
   return seed(data);
@@ -44,6 +45,41 @@ describe("GET /api", () => {
             expect(endpoints[key]).toHaveProperty("exampleResponse");
           }
         }
+      });
+  });
+});
+
+describe("GET /api/articles/:article_id", () => {
+  test("200: should respond with an article object with all relevant properties", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article.article_id).toBe(1);
+        expect(article).toHaveProperty("title", expect.any(String));
+        expect(article).toHaveProperty("topic", expect.any(String));
+        expect(article).toHaveProperty("author", expect.any(String));
+        expect(article).toHaveProperty("body", expect.any(String));
+        expect(article).toHaveProperty("created_at", expect.any(Number));
+        expect(article).toHaveProperty("votes", expect.any(Number));
+        expect(article).toHaveProperty("article_img_url", expect.any(String));
+      });
+  });
+  test("400: should return bad request if given an invalid article id", () => {
+    return request(app)
+      .get("/api/articles/hello")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("404: should return 404 not found if given valid id but no data", () => {
+    return request(app)
+      .get("/api/articles/9999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
       });
   });
 });
