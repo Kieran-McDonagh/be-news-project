@@ -1,5 +1,5 @@
 const db = require("../db/connection");
-const { convertTimestampToDate } = require("../db/seeds/utils");
+const format = require('pg-format')
 
 exports.selectArticleById = (id) => {
   return db
@@ -35,3 +35,25 @@ ORDER BY articles.created_at desc;
       return rows
     });
 };
+
+exports.addsCommentByArticleId = (article_id, newComment) => {
+    const commentToAdd = [
+      [
+        newComment.username,
+        newComment.body
+      ]
+    ];
+
+    const commentToInsert = format (`
+    INSERT INTO comments
+    (username, body)
+    Values
+    %L
+    RETURNING *;
+    `, commentToAdd)
+
+    return db.query(commentToInsert).then(({ rows }) => {
+      console.log(tows[0]);
+    return rows[0];
+  });
+}
