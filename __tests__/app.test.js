@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const request = require("supertest");
 const app = require("../app");
 
+
 beforeEach(() => {
   return seed(data);
 });
@@ -133,6 +134,7 @@ describe("ALL /notapath", () => {
   });
 });
 
+
 describe("GET /api/articles/:article_id/comments", () => {
   test("200: should return an array of comments for the given article id, with most recent comments first", () => {
     return request(app)
@@ -140,7 +142,6 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(200)
       .then(({ body }) => {
         const { comments } = body;
-        console.log(comments);
         expect(comments).toBeSortedBy("created_at", {
           descending: true,
         });
@@ -180,5 +181,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+
 
 

@@ -1,9 +1,11 @@
+
 const {
   selectArticleById,
   selectAllArticles,
   selectArticleCommentsById,
-  checkArticleIdExists,
 } = require("../models/articles.model");
+const { checkArticleIdExists } = require('../models/model-utils');
+
 
 exports.getArticleById = (req, res, next) => {
   const { article_id } = req.params;
@@ -26,9 +28,10 @@ exports.getArticleCommentsById = (req, res, next) => {
   const { article_id } = req.params;
   checkArticleIdExists(article_id)
     .then(() => {
-      selectArticleCommentsById(article_id).then((comments) => {
+      selectArticleCommentsById(article_id).then
+      ((comments) => {
         res.status(200).send({ comments });
-      });
+      })
     })
     .catch(next);
 };
