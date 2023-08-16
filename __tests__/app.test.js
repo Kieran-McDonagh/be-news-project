@@ -106,18 +106,19 @@ describe("GET /api/articles", () => {
         });
       });
   });
-  test('200: should also return article objects with no comments', () => {
-    return request(app).get('/api/articles')
-    .expect(200)
-    .then(({body}) => {
-    const {articles} = body
+  test("200: should also return article objects with no comments", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
         const articlesWithNoComments = articles.filter((article) => {
-            return article.comment_count === '0'
-        })
+          return article.comment_count === "0";
+        });
         articlesWithNoComments.forEach((article) => {
-            expect(articles).toContain(article)
-        })
-    })
+          expect(articles).toContain(article);
+        });
+      });
   });
 });
 
@@ -128,6 +129,61 @@ describe("ALL /notapath", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Not found");
+      });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("201: should update votes by article_id, when given positive number", () => {
+    const testPatch = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(testPatch)
+      .expect(201)
+      .then(({ body }) => {
+        const { updatedArticle } = body;
+        expect(updatedArticle.votes).toBe(101);
+      });
+  });
+  test("201: should update votes by article_id, when given negative number", () => {
+    const testPatch = { inc_votes: -100 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(testPatch)
+      .expect(201)
+      .then(({ body }) => {
+        const { updatedArticle } = body;
+        expect(updatedArticle.votes).toBe(0);
+      });
+  });
+  test('400: should return bad request if given invalid data', () => {
+    const testPatch = { inc_votes: 'banana' };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(testPatch)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad request');
+      });
+  });
+  test('400: should return bad request if given an invalid article id', () => {
+    const testPatch = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/articles/banana")
+      .send(testPatch)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad request');
+      });
+  });
+  test("404: should return 404 not found if given valid id but no data", () => {
+    const testPatch = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/articles/9999")
+      .send(testPatch)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Not found');
       });
   });
 });
