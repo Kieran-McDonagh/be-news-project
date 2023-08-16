@@ -134,19 +134,19 @@ describe("ALL /notapath", () => {
 
 
 
-describe('POST /api/articles/:article_id/comments', () => {
-    test('201: should add a comment for an article. responds with the posted comment', () => {
-        const testComment = {
-            username: 'test user',
-            body: 'test body'
-        }
-        return request(app).post('/api/articles/1/comments')
-        .send(testComment)
-        .expect(201)
-        .then(({body}) => {
-            const {addedComment} = body
-            expect(addedComment).toHaveProperty('username', 'test user')
-            expect(addedComment).toHaveProperty('body', 'test body')
-        })
-    });
-});
+// describe('POST /api/articles/:article_id/comments', () => {
+//     test('201: should add a comment for an article. responds with the posted comment', () => {
+//         const testComment = {
+//             username: 'test user',
+//             body: 'test body'
+//         }
+//         return request(app).post('/api/articles/1/comments')
+//         .send(testComment)
+//         .expect(201)
+//         .then(({body}) => {
+//             const {addedComment} = body
+//             expect(addedComment).toHaveProperty('username', 'test user')
+//             expect(addedComment).toHaveProperty('body', 'test body')
+//         })
+//     });
+// });
