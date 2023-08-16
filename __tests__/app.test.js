@@ -134,19 +134,34 @@ describe("ALL /notapath", () => {
 
 
 
-// describe('POST /api/articles/:article_id/comments', () => {
-//     test('201: should add a comment for an article. responds with the posted comment', () => {
-//         const testComment = {
-//             username: 'test user',
-//             body: 'test body'
-//         }
-//         return request(app).post('/api/articles/1/comments')
-//         .send(testComment)
-//         .expect(201)
-//         .then(({body}) => {
-//             const {addedComment} = body
-//             expect(addedComment).toHaveProperty('username', 'test user')
-//             expect(addedComment).toHaveProperty('body', 'test body')
-//         })
-//     });
-// });
+describe('POST /api/articles/:article_id/comments', () => {
+    test('201: should add a comment for an article. responds with the posted comment', () => {
+        const testComment = {
+            username: 'butter_bridge',
+            body: 'test body'
+        }
+        return request(app).post('/api/articles/1/comments')
+        .send(testComment)
+        .expect(201)
+        .then(({body}) => {
+            const {addedComment} = body
+            expect(addedComment).toHaveProperty('comment_id', expect.any(Number))
+            expect(addedComment).toHaveProperty('body', 'test body')
+            expect(addedComment).toHaveProperty('article_id', 1)
+            expect(addedComment).toHaveProperty('author', 'butter_bridge')
+            expect(addedComment).toHaveProperty('votes', 0)
+            expect(addedComment).toHaveProperty('created_at', expect.any(String))
+        })
+    });
+    // test('400: should return 400 bad request if given invalid data', () => {
+    //   const testComment = {
+    //     body: 'test body'
+    // }
+    // return request(app).post('/api/articles/1/comments')
+    // .send(testComment)
+    // .expect(400)
+    // .then(({body}) => {
+    //   expect(body.msg).toBe("Bad request");
+    // })
+    // });
+});

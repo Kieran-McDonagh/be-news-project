@@ -1,5 +1,5 @@
 const db = require("../db/connection");
-const format = require('pg-format')
+const format = require("pg-format");
 
 exports.selectArticleById = (id) => {
   return db
@@ -32,28 +32,24 @@ ORDER BY articles.created_at desc;
   `
     )
     .then(({ rows }) => {
-      return rows
+      return rows;
     });
 };
 
 exports.addsCommentByArticleId = (article_id, newComment) => {
-    const commentToAdd = [
-      [
-        newComment.username,
-        newComment.body
-      ]
-    ];
-
-    const commentToInsert = format (`
-    INSERT INTO comments
-    (username, body)
-    Values
-    %L
-    RETURNING *;
-    `, commentToAdd)
-
-    return db.query(commentToInsert).then(({ rows }) => {
-      console.log(tows[0]);
+  const { username, body } = newComment;
+  const commentToAdd = [[body, article_id, username]];
+  const commentToInsert = format(
+    `
+        INSERT INTO comments
+        (body, article_id, author)
+        VALUES
+        %L
+        RETURNING*;
+        `,
+    commentToAdd
+  );
+  return db.query(commentToInsert).then(({ rows }) => {
     return rows[0];
   });
-}
+};
