@@ -106,18 +106,19 @@ describe("GET /api/articles", () => {
         });
       });
   });
-  test('200: should also return article objects with no comments', () => {
-    return request(app).get('/api/articles')
-    .expect(200)
-    .then(({body}) => {
-    const {articles} = body
+  test("200: should also return article objects with no comments", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
         const articlesWithNoComments = articles.filter((article) => {
-            return article.comment_count === '0'
-        })
+          return article.comment_count === "0";
+        });
         articlesWithNoComments.forEach((article) => {
-            expect(articles).toContain(article)
-        })
-    })
+          expect(articles).toContain(article);
+        });
+      });
   });
 });
 
@@ -131,3 +132,53 @@ describe("ALL /notapath", () => {
       });
   });
 });
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: should return an array of comments for the given article id, with most recent comments first", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        console.log(comments);
+        expect(comments).toBeSortedBy("created_at", {
+          descending: true,
+        });
+        comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id", expect.any(Number));
+          expect(comment).toHaveProperty("votes", expect.any(Number));
+          expect(comment).toHaveProperty("created_at", expect.any(String));
+          expect(comment).toHaveProperty("author", expect.any(String));
+          expect(comment).toHaveProperty("body", expect.any(String));
+          expect(comment).toHaveProperty("article_id", expect.any(Number));
+        });
+      });
+  });
+  test("200: should return an empty array if the id is valid and the article exists but there are no comments", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toEqual([]);
+      });
+  });
+  test("400: should return bad request if given an invalid article id", () => {
+    return request(app)
+      .get("/api/articles/hello/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("404: should return 404 not found if given valid id but article does not exist", () => {
+    return request(app)
+      .get("/api/articles/9999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
+      });
+  });
+});
+
+
