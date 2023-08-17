@@ -7,8 +7,7 @@ const {
 } = require("../models/articles.model");
 const {
   checkCommentData,
-  checkArticleIdExists,
-  checkTopicExists,
+  checkArticleIdExists
 } = require("../models/model-utils");
 
 exports.getArticleById = (req, res, next) => {
