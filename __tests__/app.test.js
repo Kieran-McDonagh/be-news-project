@@ -176,14 +176,14 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(body.msg).toBe('Bad request');
       });
   });
-  // test("404: should return 404 not found if given valid id but no data", () => {
-  //   const testPatch = { inc_votes: 1 };
-  //   return request(app)
-  //     .patch("/api/articles/9999")
-  //     .send(testPatch)
-  //     .expect(404)
-  //     .then(({ body }) => {
-  //       expect(body.msg).toBe('Not found');
-  //     });
-  // });
+  test("404: should return 404 not found if given valid id but no data", () => {
+    const testPatch = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/articles/9999")
+      .send(testPatch)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Not found');
+      });
+  });
 });
