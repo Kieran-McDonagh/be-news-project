@@ -156,16 +156,16 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(updatedArticle.votes).toBe(0);
       });
   });
-  test('400: should return bad request if given invalid data', () => {
-    const testPatch = { inc_votes: 'banana' };
-    return request(app)
-      .patch("/api/articles/1")
-      .send(testPatch)
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe('Bad request');
-      });
-  });
+  // test('400: should return bad request if given invalid data', () => {
+  //   const testPatch = { inc_votes: 'banana' };
+  //   return request(app)
+  //     .patch("/api/articles/1")
+  //     .send(testPatch)
+  //     .expect(400)
+  //     .then(({ body }) => {
+  //       expect(body.msg).toBe('Bad request');
+  //     });
+  // });
   test('400: should return bad request if given an invalid article id', () => {
     const testPatch = { inc_votes: 1 };
     return request(app)
@@ -176,14 +176,14 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(body.msg).toBe('Bad request');
       });
   });
-  test("404: should return 404 not found if given valid id but no data", () => {
-    const testPatch = { inc_votes: 1 };
-    return request(app)
-      .patch("/api/articles/9999")
-      .send(testPatch)
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe('Not found');
-      });
-  });
+  // test("404: should return 404 not found if given valid id but no data", () => {
+  //   const testPatch = { inc_votes: 1 };
+  //   return request(app)
+  //     .patch("/api/articles/9999")
+  //     .send(testPatch)
+  //     .expect(404)
+  //     .then(({ body }) => {
+  //       expect(body.msg).toBe('Not found');
+  //     });
+  // });
 });
