@@ -2,6 +2,7 @@ const {
   selectArticleById,
   selectAllArticles,
   addsCommentByArticleId,
+  selectArticleCommentsById,
 } = require("../models/articles.model");
 const {
   checkCommentData,
@@ -29,10 +30,23 @@ exports.postCommentByArticleId = (req, res, next) => {
   const { username } = newComment;
   checkArticleIdExists(article_id)
     .then(() => {
-     return checkCommentData(username).then(() => {
-       return addsCommentByArticleId(article_id, newComment).then((addedComment) => {
-          res.status(201).send({ addedComment });
-        });
+      return checkCommentData(username).then(() => {
+        return addsCommentByArticleId(article_id, newComment).then(
+          (addedComment) => {
+            res.status(201).send({ addedComment });
+          }
+        );
+      });
+    })
+    .catch(next);
+};
+
+exports.getArticleCommentsById = (req, res, next) => {
+  const { article_id } = req.params;
+  checkArticleIdExists(article_id)
+    .then(() => {
+      selectArticleCommentsById(article_id).then((comments) => {
+        res.status(200).send({ comments });
       });
     })
     .catch(next);

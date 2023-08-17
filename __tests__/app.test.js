@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const request = require("supertest");
 const app = require("../app");
 
+
 beforeEach(() => {
   return seed(data);
 });
@@ -126,6 +127,54 @@ describe("ALL /notapath", () => {
   test("404: should respond with a custom 404 message if the path is not found", () => {
     return request(app)
       .get("/api/banana")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
+      });
+  });
+});
+
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: should return an array of comments for the given article id, with most recent comments first", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toBeSortedBy("created_at", {
+          descending: true,
+        });
+        comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id", expect.any(Number));
+          expect(comment).toHaveProperty("votes", expect.any(Number));
+          expect(comment).toHaveProperty("created_at", expect.any(String));
+          expect(comment).toHaveProperty("author", expect.any(String));
+          expect(comment).toHaveProperty("body", expect.any(String));
+          expect(comment).toHaveProperty("article_id", expect.any(Number));
+        });
+      });
+  });
+  test("200: should return an empty array if the id is valid and the article exists but there are no comments", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toEqual([]);
+      });
+  });
+  test("400: should return bad request if given an invalid article id", () => {
+    return request(app)
+      .get("/api/articles/hello/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("404: should return 404 not found if given valid id but article does not exist", () => {
+    return request(app)
+      .get("/api/articles/9999/comments")
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Not found");
