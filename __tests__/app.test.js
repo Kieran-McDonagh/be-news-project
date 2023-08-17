@@ -4,7 +4,6 @@ const db = require("../db/connection");
 const request = require("supertest");
 const app = require("../app");
 
-
 beforeEach(() => {
   return seed(data);
 });
@@ -133,7 +132,6 @@ describe("ALL /notapath", () => {
       });
   });
 });
-
 
 describe("GET /api/articles/:article_id/comments", () => {
   test("200: should return an array of comments for the given article id, with most recent comments first", () => {
@@ -266,24 +264,24 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(updatedArticle.votes).toBe(0);
       });
   });
-  test('400: should return bad request if given invalid data', () => {
-    const testPatch = { inc_votes: 'banana' };
+  test("400: should return bad request if given invalid data", () => {
+    const testPatch = { inc_votes: "banana" };
     return request(app)
       .patch("/api/articles/1")
       .send(testPatch)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe('Bad request');
+        expect(body.msg).toBe("Bad request");
       });
   });
-  test('400: should return bad request if given an invalid article id', () => {
+  test("400: should return bad request if given an invalid article id", () => {
     const testPatch = { inc_votes: 1 };
     return request(app)
       .patch("/api/articles/banana")
       .send(testPatch)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe('Bad request');
+        expect(body.msg).toBe("Bad request");
       });
   });
   test("404: should return 404 not found if given valid id but no data", () => {
@@ -293,28 +291,31 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(testPatch)
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe('Not found');
+        expect(body.msg).toBe("Not found");
       });
   });
 });
 
-describe('DELETE /api/comments/:comment_id', () => {
-  test('204: should respond with a status 204 and no content', () => {
-    return request(app).delete('/api/comments/1')
-    .expect(204)
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: should respond with a status 204 and no content", () => {
+    return request(app).delete("/api/comments/1").expect(204);
   });
-  test('204: deleted comment should be removed from database', () => {
-    return request(app).delete('/api/comments/1')
-    .expect(204)
-    .then(() => {
-      return db.query(`
-      SELECT * FROM comments;
-      `)
-    }).then(({rows}) => {
-      rows.forEach(row => {
-        expect(row.comment_id).not.toBe(1)
+  test("204: deleted comment should be removed from database", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204)
+      .then(() => {
+        return db.query(
+          `
+      SELECT * FROM comments WHERE comment_id = $1;
+      `,
+          [1]
+        );
       })
-    })
+      .then(({ rows }) => {
+        expect(rows.length).toBe(0);
+        expect(rows).toEqual([]);
+      });
   });
   test("400: should return 400 bad request if comment_id is not valid", () => {
     return request(app)
@@ -330,6 +331,22 @@ describe('DELETE /api/comments/:comment_id', () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Not found");
+      });
+  });
+});
+
+describe("GET /api/users", () => {
+  test("200: Responds with: an array of objects", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        users.forEach((user) => {
+          expect(user).toHaveProperty("username", expect.any(String));
+          expect(user).toHaveProperty("name", expect.any(String));
+          expect(user).toHaveProperty("avatar_url", expect.any(String));
+        });
       });
   });
 });

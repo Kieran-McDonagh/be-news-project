@@ -93,5 +93,23 @@
       "description": "deletes comment by comment id",
       "queries": "comment_id",
       "exampleResponse": "204 status"
+    },
+    "GET /api/users": {
+      "description": "responds with an array of user objects",
+      "queries": [],
+      "exampleResponse": {
+        "users": [
+          {
+            "username": "butter_bridge",
+            "name": "jonny",
+            "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+          },
+          {
+            "username": "icellusedkars",
+            "name": "sam",
+            "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+          }
+        ]
+      }
     }
 }

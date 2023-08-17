@@ -12,6 +12,7 @@ const {
   handleCustomErrors,
 } = require("./controllers/error.controller");
 const { deleteCommentById } = require("./controllers/comments.controller");
+const { getAllUsers } = require("./controllers/users.controller");
 const app = express();
 
 app.use(express.json())
@@ -24,10 +25,13 @@ app.get("/api/articles", getAllArticles);
 
 app.get("/api/articles/:article_id", getArticleById);
 
-app.patch('/api/articles/:article_id', patchArticleById)
-app.post('/api/articles/:article_id/comments', postCommentByArticleId)
-
 app.get("/api/articles/:article_id/comments", getArticleCommentsById);
+
+app.get('/api/users', getAllUsers)
+
+app.patch('/api/articles/:article_id', patchArticleById)
+
+app.post('/api/articles/:article_id/comments', postCommentByArticleId)
 
 app.delete('/api/comments/:comment_id', deleteCommentById)
 
