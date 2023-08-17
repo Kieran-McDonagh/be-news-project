@@ -50,6 +50,10 @@ exports.updateArticleById = (article_id, inc_votes) => {
   }
 const values = [inc_votes, article_id];
 return db.query(text, values).then(({ rows }) => {
+  
+  if (rows.length === 0) {
+   return Promise.reject({status: 400, msg: 'Bad request'})
+  }
   return rows[0];
 });
 }
