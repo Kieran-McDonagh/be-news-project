@@ -36,24 +36,12 @@ ORDER BY articles.created_at desc;
 };
 
 exports.updateArticleById = (article_id, inc_votes) => {
-  let text = ``
-  if (inc_votes >= 0) {
-    text = `UPDATE articles SET votes = votes + $1
+    const text = `UPDATE articles SET votes = votes + $1
     WHERE article_id = $2
     RETURNING *;`
-  } 
-  if (inc_votes < 0) {
-    inc_votes -= inc_votes * 2
-    text = `UPDATE articles SET votes = votes - $1
-    WHERE article_id = $2
-    RETURNING *;`
-  }
+
 const values = [inc_votes, article_id];
 return db.query(text, values).then(({ rows }) => {
-  
-  if (rows.length === 0) {
-   return Promise.reject({status: 400, msg: 'Bad request'})
-  }
   return rows[0];
 });
 }

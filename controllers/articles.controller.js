@@ -19,10 +19,10 @@ exports.getAllArticles = (req, res, next) => {
 exports.patchArticleById = (req, res, next) => {
     const {article_id} = req.params
     const {inc_votes} = req.body
-    checkArticleIdExists(article_id).then(() => {
-      return updateArticleById(article_id, inc_votes).then((updatedArticle) => {
-    res.status(201).send({updatedArticle})
-  })
+
+    const promises = [checkArticleIdExists(article_id), updateArticleById(article_id, inc_votes)]
+    Promise.all(promises).then(([_, updatedArticle]) => {
+      res.status(200).send({updatedArticle})
     })
   .catch(next)
 }

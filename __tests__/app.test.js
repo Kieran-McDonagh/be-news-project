@@ -134,23 +134,23 @@ describe("ALL /notapath", () => {
 });
 
 describe("PATCH /api/articles/:article_id", () => {
-  test("201: should update votes by article_id, when given positive number", () => {
+  test("200: should update votes by article_id, when given positive number", () => {
     const testPatch = { inc_votes: 1 };
     return request(app)
       .patch("/api/articles/1")
       .send(testPatch)
-      .expect(201)
+      .expect(200)
       .then(({ body }) => {
         const { updatedArticle } = body;
         expect(updatedArticle.votes).toBe(101);
       });
   });
-  test("201: should update votes by article_id, when given negative number", () => {
+  test("200: should update votes by article_id, when given negative number", () => {
     const testPatch = { inc_votes: -100 };
     return request(app)
       .patch("/api/articles/1")
       .send(testPatch)
-      .expect(201)
+      .expect(200)
       .then(({ body }) => {
         const { updatedArticle } = body;
         expect(updatedArticle.votes).toBe(0);
