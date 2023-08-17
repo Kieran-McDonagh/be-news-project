@@ -297,3 +297,39 @@ describe("PATCH /api/articles/:article_id", () => {
       });
   });
 });
+
+describe('DELETE /api/comments/:comment_id', () => {
+  test('204: should respond with a status 204 and no content', () => {
+    return request(app).delete('/api/comments/1')
+    .expect(204)
+  });
+  test('204: deleted comment should be removed from database', () => {
+    return request(app).delete('/api/comments/1')
+    .expect(204)
+    .then(() => {
+      return db.query(`
+      SELECT * FROM comments;
+      `)
+    }).then(({rows}) => {
+      rows.forEach(row => {
+        expect(row.comment_id).not.toBe(1)
+      })
+    })
+  });
+  test("400: should return 400 bad request if comment_id is not valid", () => {
+    return request(app)
+      .delete("/api/comments/banana")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("404: should return 404 not found if comment_id does not exist", () => {
+    return request(app)
+      .delete("/api/comments/9999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
+      });
+  });
+});

@@ -58,5 +58,40 @@
         }
       ]
     }
-  }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "request body accepts an object and responds with the posted comment",
+    "queries": "an abject with the following properties: username, body",
+    "exampleResponse": {
+        "addedComment": {
+          "comment_id": 19,
+          "body": "test body",
+          "article_id": 1,
+          "author": "butter_bridge",
+          "votes": 0,
+          "created_at": "2023-08-17T10:56:31.343Z"
+        }
+      }
+    },
+    "PATCH /api/articles/:article_id": {
+      "description": "update an article by article_id",
+      "queries": "article_id",
+      "exampleResponse": {
+        "updatedArticle": {
+          "article_id": 1,
+          "title": "Living in the shadow of a great man",
+          "topic": "mitch",
+          "author": "butter_bridge",
+          "body": "I find this existence challenging",
+          "created_at": "2020-07-09T20:11:00.000Z",
+          "votes": 101,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        }
+      }
+    },
+    "DELETE /api/comments/:comment_id": {
+      "description": "deletes comment by comment id",
+      "queries": "comment_id",
+      "exampleResponse": "204 status"
+    }
 }
