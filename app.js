@@ -3,7 +3,7 @@ const { getTopics } = require("./controllers/topics.controllers");
 const { getEndpoints } = require("./controllers/endpoints.controller");
 const {patchArticleById,
   getArticleById,
-  getAllArticles,
+  getArticles,
   getArticleCommentsById,
   postCommentByArticleId
 } = require("./controllers/articles.controller");
@@ -21,7 +21,7 @@ app.get("/api", getEndpoints);
 
 app.get("/api/topics", getTopics);
 
-app.get("/api/articles", getAllArticles);
+app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id", getArticleById);
 
@@ -44,7 +44,6 @@ app.use(handle400s);
 app.use(handleCustomErrors);
 
 app.use((err, req, res, next) => {
-    console.log(err);
   res.status(500).send({ msg: err });
 });
 

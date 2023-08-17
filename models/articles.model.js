@@ -1,5 +1,6 @@
 const db = require("../db/connection");
-const format = require('pg-format')
+const format = require("pg-format");
+const { checkTopicExists } = require("./model-utils");
 
 exports.selectArticleById = (id) => {
   return db
@@ -19,33 +20,77 @@ exports.selectArticleById = (id) => {
     });
 };
 
-exports.selectAllArticles = () => {
-  return db
-    .query(
-      `
-  SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url,
+exports.selectAllArticles = (topic, order_by = "created_at", order = 'desc') => {
+  const acceptedOrderBy = [
+    "article_id",
+    "title",
+    "topic",
+    "author",
+    "body",
+    "created_at",
+    "votes",
+    "article_img_url",
+    "comment_count",
+  ];
+
+  const acceptedOrder = ['asc', 'desc']
+
+  if (!acceptedOrder.includes(order)) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+
+  if (!acceptedOrderBy.includes(order_by)) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+
+  let baseString = `
+  SELECT 
+  articles.author,
+  articles.title,
+  articles.article_id,
+  articles.topic,
+  articles.created_at,
+  articles.votes,
+  articles.article_img_url,
   COUNT(comments.comment_id) AS comment_count
   FROM articles
   LEFT JOIN comments ON comments.article_id = articles.article_id
-  GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url
-  ORDER BY articles.created_at desc;
-  `
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+  GROUP BY 
+  articles.author,
+  articles.title,
+  articles.article_id,
+  articles.topic,
+  articles.created_at,
+  articles.votes,
+  articles.article_img_url `;
+
+  baseString += `ORDER BY ${order_by} ${order}`;
+
+  return db.query(baseString).then(({ rows }) => {
+      if (topic) {
+       return checkTopicExists(topic).then(() => {
+          return rows.filter((article) => {
+            if (article["topic"] === topic){
+              return article;
+            } 
+          });
+        })
+      } else {
+         return rows;
+      }
+  });
 };
 
 exports.updateArticleById = (article_id, inc_votes) => {
   const text = `UPDATE articles SET votes = votes + $1
   WHERE article_id = $2
-  RETURNING *;`
+  RETURNING *;`;
 
-const values = [inc_votes, article_id];
-return db.query(text, values).then(({ rows }) => {
-return rows[0];
-});
-}
+  const values = [inc_votes, article_id];
+  return db.query(text, values).then(({ rows }) => {
+    return rows[0];
+  });
+};
 
 exports.selectArticleCommentsById = (article_id) => {
   return db

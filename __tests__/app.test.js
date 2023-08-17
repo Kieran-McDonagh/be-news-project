@@ -350,3 +350,93 @@ describe("GET /api/users", () => {
       });
   });
 });
+
+describe('GET /api/articles (queries)', () => {
+ describe('sorting articles by topics', () => {
+    test('200: filters the articles by the topic value', () => {
+      return request(app).get('/api/articles?topic=mitch')
+      .expect(200)
+      .then(({body}) => {
+        const {articles} = body
+        articles.forEach(article => {
+          expect(article.topic).toBe('mitch')
+          expect(article.topic).not.toBe('cats')
+          expect(article).toHaveProperty("author", expect.any(String));
+          expect(article).toHaveProperty("title", expect.any(String));
+          expect(article).toHaveProperty("article_id", expect.any(Number));
+          expect(article).toHaveProperty("created_at", expect.any(String));
+          expect(article).toHaveProperty("votes", expect.any(Number));
+          expect(article).toHaveProperty("article_img_url", expect.any(String));
+          expect(article).toHaveProperty("comment_count", expect.any(String));
+          expect(article).not.toHaveProperty("body");
+        })
+      })
+    });
+    test('404: should respond with Not found if no topics match query', () => {
+      return request(app).get('/api/articles?topic=banana')
+      .expect(404)
+      .then(({body}) => {
+       expect(body.msg).toBe('Not found')
+      })
+    });
+    describe('sorts articles by query', () => {
+      test('should sort the articles by any valid column', () => {
+        return request(app).get('/api/articles?sort_by=article_id')
+        .expect(200)
+        .then(({body}) => {
+          const {articles} = body
+          expect(articles).toBeSortedBy('article_id', {descending: true})
+        })
+      });
+      test('400: should return bad request if given a query that does not exist', () => {
+        return request(app).get('/api/articles?sort_by=banana')
+        .expect(400)
+        .then(({body}) => {
+          expect(body.msg).toBe('Bad request')
+        })
+      });
+    });
+    describe('sorts articles by ascending or descending', () => {
+      test('200: should sort the articles by either ascending or descending values', () => {
+        return request(app).get('/api/articles?order=asc')
+        .expect(200)
+        .then(({body}) => {
+          const {articles} = body
+          expect(articles).toBeSortedBy('created_at', {ascending: true})
+        })
+      });
+      test('400: should return bad request if given a query that does not exist', () => {
+        return request(app).get('/api/articles?order=banana')
+        .expect(400)
+        .then(({body}) => {
+          expect(body.msg).toBe('Bad request')
+        })
+      });
+    });
+    describe('multiple queries', () => {
+      test('200: should return an array of correctly formatted objects when given multiple queries ', () => {
+        return request(app).get('/api/articles?topic=mitch&sort_by=article_id&order=asc')
+        .expect(200)
+        .then(({body}) => {
+          const {articles} = body
+          expect(articles).toBeSortedBy('article_id',{ascending: true})
+          articles.forEach(article => {
+            expect(article.topic).toBe('mitch')
+            expect(article.topic).not.toBe('cats')
+            expect(article).toHaveProperty("author", expect.any(String));
+            expect(article).toHaveProperty("title", expect.any(String));
+            expect(article).toHaveProperty("article_id", expect.any(Number));
+            expect(article).toHaveProperty("created_at", expect.any(String));
+            expect(article).toHaveProperty("votes", expect.any(Number));
+            expect(article).toHaveProperty("article_img_url", expect.any(String));
+            expect(article).toHaveProperty("comment_count", expect.any(String));
+            expect(article).not.toHaveProperty("body");
+          })
+        })
+      });
+    });
+ });
+})
+
+
+
