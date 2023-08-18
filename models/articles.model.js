@@ -3,21 +3,30 @@ const format = require("pg-format");
 const { checkTopicExists } = require("./model-utils");
 
 exports.selectArticleById = (id) => {
-  return db
-    .query(
-      `
+  const selectArticle = () => {
+    return db.query(`
     SELECT * FROM articles
-    WHERE article_id = $1;
-    `,
-      [id]
+    WHERE article_id = $1
+    `, [id]
     )
-    .then(({ rows }) => {
-      if (rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "Not found" });
-      }
-      const article = rows[0];
-      return article;
-    });
+  }
+  const selectCommentCount = () => {
+    return db.query(`
+    SELECT COUNT (*) AS comment_count FROM comments
+    WHERE article_id = $1
+    `, [id]
+    )
+  }
+  const promises = [selectArticle(), selectCommentCount()]
+  return Promise.all(promises).then(([articleResult, commentResult]) => {
+    if (articleResult.rows.length === 0) {
+      return Promise.reject({status: 404, msg: 'Not found'})
+    }
+      const {comment_count} = commentResult.rows[0]
+      const article = articleResult.rows[0]
+      article.comment_count = comment_count
+      return article
+  })
 };
 
 exports.selectAllArticles = async (

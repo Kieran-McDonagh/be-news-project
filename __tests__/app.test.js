@@ -65,6 +65,24 @@ describe("GET /api/articles/:article_id", () => {
         expect(article).toHaveProperty("article_img_url", expect.any(String));
       });
   });
+  test('200: should also return a comment count, which is the total count of all the comments with this article_id', () => {
+    return request(app).get('/api/articles/1')
+    .expect(200)
+    .then(({body}) => {
+      const {article} = body
+      expect(article).toHaveProperty('comment_count')
+      expect(article.comment_count).toBe('11')
+    })
+  });
+  test('200: should return a comment count of 0 for articles with no comments', () => {
+    return request(app).get('/api/articles/2')
+    .expect(200)
+    .then(({body}) => {
+      const {article} = body
+      expect(article).toHaveProperty('comment_count')
+      expect(article.comment_count).toBe('0')
+    })
+  });
   test("400: should return bad request if given an invalid article id", () => {
     return request(app)
       .get("/api/articles/hello")
