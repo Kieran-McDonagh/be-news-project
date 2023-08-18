@@ -15,7 +15,7 @@ Northcoders news API is a project I have built for the Northcoders software deve
 
 ## Demo
 
-View the hosted version of the project at https://news-api-rist.onrender.com/.
+View the hosted version of the project at https://news-api-rist.onrender.com/api/.
 
 ## Description
 
