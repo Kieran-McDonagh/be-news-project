@@ -3,7 +3,7 @@ const {
   selectAllArticles,
   addsCommentByArticleId,
   selectArticleCommentsById,
-  updateArticleById,
+  updateArticleById
 } = require("../models/articles.model");
 const {
   checkCommentData,
@@ -19,11 +19,13 @@ exports.getArticleById = (req, res, next) => {
     .catch(next);
 };
 
-exports.getAllArticles = (req, res, next) => {
-  selectAllArticles().then((articles) => {
-    res.status(200).send({ articles });
-  });
-};
+exports.getArticles = (req, res, next) => {
+  const {topic, sort_by, order} = req.query
+    return selectAllArticles(topic, sort_by, order).then((articles) => {
+       res.status(200).send({ articles });
+  }).catch(next)
+  }
+    
 
 exports.patchArticleById = (req, res, next) => {
   const { article_id } = req.params;
