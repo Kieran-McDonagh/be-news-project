@@ -358,6 +358,7 @@ describe('GET /api/articles (queries)', () => {
       .expect(200)
       .then(({body}) => {
         const {articles} = body
+        expect(articles.length).not.toBe(0)
         articles.forEach(article => {
           expect(article.topic).toBe('mitch')
           expect(article.topic).not.toBe('cats')
@@ -419,6 +420,7 @@ describe('GET /api/articles (queries)', () => {
         .expect(200)
         .then(({body}) => {
           const {articles} = body
+          expect(articles.length).not.toBe(0)
           expect(articles).toBeSortedBy('article_id',{ascending: true})
           articles.forEach(article => {
             expect(article.topic).toBe('mitch')
@@ -432,6 +434,13 @@ describe('GET /api/articles (queries)', () => {
             expect(article).toHaveProperty("comment_count", expect.any(String));
             expect(article).not.toHaveProperty("body");
           })
+        })
+      });
+      test('200: should return an empty array when given a topic that does exist but has no articles', () => {
+        return request(app).get('/api/articles?topic=paper').expect(200)
+        .then(({body}) => {
+          const {articles} = body
+          expect(articles).toEqual([])
         })
       });
     });

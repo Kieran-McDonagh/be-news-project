@@ -44,6 +44,7 @@ app.use(handle400s);
 app.use(handleCustomErrors);
 
 app.use((err, req, res, next) => {
+  console.log(err);
   res.status(500).send({ msg: err });
 });
 

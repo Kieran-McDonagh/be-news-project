@@ -20,7 +20,11 @@ exports.selectArticleById = (id) => {
     });
 };
 
-exports.selectAllArticles = (topic, order_by = "created_at", order = 'desc') => {
+exports.selectAllArticles = async (
+  topic,
+  sort_by = "created_at",
+  order = "desc"
+) => {
   const acceptedOrderBy = [
     "article_id",
     "title",
@@ -33,13 +37,13 @@ exports.selectAllArticles = (topic, order_by = "created_at", order = 'desc') => 
     "comment_count",
   ];
 
-  const acceptedOrder = ['asc', 'desc']
+  const acceptedOrder = ["asc", "desc"];
 
   if (!acceptedOrder.includes(order)) {
     return Promise.reject({ status: 400, msg: "Bad request" });
   }
 
-  if (!acceptedOrderBy.includes(order_by)) {
+  if (!acceptedOrderBy.includes(sort_by)) {
     return Promise.reject({ status: 400, msg: "Bad request" });
   }
 
@@ -54,7 +58,18 @@ exports.selectAllArticles = (topic, order_by = "created_at", order = 'desc') => 
   articles.article_img_url,
   COUNT(comments.comment_id) AS comment_count
   FROM articles
-  LEFT JOIN comments ON comments.article_id = articles.article_id
+  LEFT JOIN comments ON comments.article_id = articles.article_id `;
+
+  if (topic) {
+    try {
+      await checkTopicExists(topic);
+      baseString += `WHERE articles.topic = '${topic}'`;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  baseString += `
   GROUP BY 
   articles.author,
   articles.title,
@@ -62,22 +77,11 @@ exports.selectAllArticles = (topic, order_by = "created_at", order = 'desc') => 
   articles.topic,
   articles.created_at,
   articles.votes,
-  articles.article_img_url `;
-
-  baseString += `ORDER BY ${order_by} ${order}`;
+  articles.article_img_url
+  ORDER BY ${sort_by} ${order} `;
 
   return db.query(baseString).then(({ rows }) => {
-      if (topic) {
-       return checkTopicExists(topic).then(() => {
-          return rows.filter((article) => {
-            if (article["topic"] === topic){
-              return article;
-            } 
-          });
-        })
-      } else {
-         return rows;
-      }
+    return rows;
   });
 };
 
