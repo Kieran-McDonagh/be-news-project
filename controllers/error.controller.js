@@ -7,5 +7,14 @@ exports.handle400s = (err, req, res, next) => {
 exports.handleCustomErrors = (err, req, res, next) => {
   if (err.status && err.msg) {
     res.status(err.status).send({ msg: err.msg });
-  } else next(err)
+  } else next(err);
+};
+
+exports.handle404s = (_, res) => {
+  res.status(404).send({ msg: "Not found" });
+};
+
+exports.handleServerError = (err, req, res, next) => {
+  console.log(err);
+  res.status(500).send({ msg: err });
 };
