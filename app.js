@@ -1,54 +1,23 @@
 const express = require("express");
-const cors = require('cors');
-const { getTopics } = require("./controllers/topics.controllers");
+const cors = require("cors");
 const { getEndpoints } = require("./controllers/endpoints.controller");
-const {patchArticleById,
-  getArticleById,
-  getArticles,
-  getArticleCommentsById,
-  postCommentByArticleId
-} = require("./controllers/articles.controller");
 const {
   handle400s,
   handleCustomErrors,
+  handle404s,
+  handleServerError,
 } = require("./controllers/error.controller");
-const { deleteCommentById } = require("./controllers/comments.controller");
-const { getAllUsers } = require("./controllers/users.controller");
+const apiRouter = require("./routes/api-router");
 const app = express();
-
 app.use(cors());
+app.use(express.json());
 
-app.use(express.json())
-
+app.use("/api", apiRouter);
 app.get("/api", getEndpoints);
 
-app.get("/api/topics", getTopics);
-
-app.get("/api/articles", getArticles);
-
-app.get("/api/articles/:article_id", getArticleById);
-
-app.get("/api/articles/:article_id/comments", getArticleCommentsById);
-
-app.get('/api/users', getAllUsers)
-
-app.patch('/api/articles/:article_id', patchArticleById)
-
-app.post('/api/articles/:article_id/comments', postCommentByArticleId)
-
-app.delete('/api/comments/:comment_id', deleteCommentById)
-
-app.use((_, res) => {
-  res.status(404).send({ msg: "Not found" });
-});
-
+app.use(handle404s);
 app.use(handle400s);
-
 app.use(handleCustomErrors);
-
-app.use((err, req, res, next) => {
-  console.log(err);
-  res.status(500).send({ msg: err });
-});
+app.use(handleServerError);
 
 module.exports = app;
